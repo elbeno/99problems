@@ -6,6 +6,10 @@ import Test.HUnit
 
 import Utils
 import Q1to10
+import Q11to20
+
+
+-- Tests Q1-10
 
 testMyLast :: (Show a, Eq a) => ([a], a) -> Assertion
 testMyLast (xs, expected) =
@@ -50,6 +54,50 @@ testEncode :: (Show a, Eq a) => ([a], [(Int, a)]) -> Assertion
 testEncode (xs, expected) =
   expected @=? encode xs
 
+-- tests Q11-20
+
+testEncodeModified :: (Show a, Eq a) => ([a], [RLE a]) -> Assertion
+testEncodeModified (xs, expected) =
+  expected @=? encodeModified xs
+
+testDecodeModified :: (Show a, Eq a) => ([RLE a], [a]) -> Assertion
+testDecodeModified (xs, expected) =
+  expected @=? decodeModified xs
+
+testEncodeDirect :: (Show a, Eq a) => ([a], [RLE a]) -> Assertion
+testEncodeDirect (xs, expected) =
+  expected @=? encodeDirect xs
+
+testDupli :: (Show a, Eq a) => ([a], [a]) -> Assertion
+testDupli (xs, expected) =
+  expected @=? dupli xs
+
+testRepli :: (Show a, Eq a) => ([a], Int, [a]) -> Assertion
+testRepli (xs, n, expected) =
+  expected @=? repli xs n
+
+testDropEvery :: (Show a, Eq a) => ([a], Int, [a]) -> Assertion
+testDropEvery (xs, n, expected) =
+  expected @=? dropEvery xs n
+
+testSplit :: (Show a, Eq a) => ([a], Int, ([a], [a])) -> Assertion
+testSplit (xs, n, expected) =
+  expected @=? split xs n
+
+testSlice :: (Show a, Eq a) => ([a], Int, Int, [a]) -> Assertion
+testSlice (xs, a, b, expected) =
+  expected @=? slice xs a b
+
+testRotate :: (Show a, Eq a) => ([a], Int, [a]) -> Assertion
+testRotate (xs, n, expected) =
+  expected @=? rotate xs n
+
+testRemoveAt :: (Show a, Eq a) => ([a], Int, (a, [a])) -> Assertion
+testRemoveAt (xs, n, expected) =
+  expected @=? removeAt xs n
+
+-- test groups
+
 tests :: [TF.Test]
 tests =
   [
@@ -90,6 +138,36 @@ tests =
 
       testWithProvider "Q10: encode" testEncode
       [("aaaabccaadeeee", [(4,'a'),(1,'b'),(2,'c'),(2,'a'),(1,'d'),(4,'e')])]
+    ],
+
+    TF.testGroup "Q11to20"
+    [
+      testWithProvider "Q11: encodeModified" testEncodeModified
+      [("aaaabccaadeeee", [Multiple 4 'a', Single 'b', Multiple 2 'c',
+                           Multiple 2 'a', Single 'd',Multiple 4 'e'])],
+
+      testWithProvider "Q12: decodeModified" testDecodeModified
+      [([Multiple 4 'a', Single 'b', Multiple 2 'c',
+         Multiple 2 'a', Single 'd',Multiple 4 'e'], "aaaabccaadeeee")],
+
+      testWithProvider "Q13: encodeDirect" testEncodeDirect
+      [("aaaabccaadeeee", [Multiple 4 'a', Single 'b', Multiple 2 'c',
+                           Multiple 2 'a', Single 'd',Multiple 4 'e'])],
+
+      testWithProvider "Q14: dupli" testDupli [([1,2,3] :: [Integer], [1,1,2,2,3,3])],
+
+      testWithProvider "Q15: repli" testRepli [("abc", 3, "aaabbbccc")],
+
+      testWithProvider "Q16: dropEvery" testDropEvery [("abcdefghik", 3, "abdeghk")],
+
+      testWithProvider "Q17: split" testSplit [("abcdefghik", 3, ("abc", "defghik"))],
+
+      testWithProvider "Q18: slice" testSlice [("abcdefghik", 3, 7, "cdefg")],
+
+      testWithProvider "Q19: rotate 1" testRotate [("abcdefgh", 3, "defghabc")],
+      testWithProvider "Q19: rotate 2" testRotate [("abcdefgh", (-2), "ghabcdef")],
+
+      testWithProvider "Q20: rotate 1" testRemoveAt [("abcd", 2, ('b', "acd"))]
     ]
   ]
 
